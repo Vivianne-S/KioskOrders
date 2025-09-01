@@ -16,31 +16,41 @@ struct LoginView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
-                // Header
-                VStack {
-                    Image(systemName: "cart.fill")
-                        .resizable()
-                        .frame(width: 60, height: 50)
-                        .foregroundColor(.blue)
-                    Text("KioskOrders")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    Text("Logga in för att handla")
-                        .foregroundColor(.gray)
-                }
-                .padding(.top, 50)
+            VStack(spacing: 25) {
                 
-                // Form
+                // HEADER
+                ZStack {
+                    LinearGradient(colors: [.pink, .purple, .orange], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        .frame(height: 180)
+                        .cornerRadius(30)
+                        .shadow(radius: 5)
+                    
+                    VStack(spacing: 8) {
+                        Image(systemName: "cart.fill")
+                            .resizable()
+                            .frame(width: 60, height: 50)
+                            .foregroundColor(.yellow)
+                        Text("KioskOrders")
+                            .font(.largeTitle)
+                            .fontWeight(.heavy)
+                            .foregroundColor(.white)
+                        Text("Logga in för att handla")
+                            .foregroundColor(.yellow.opacity(0.8))
+                    }
+                }
+                .padding(.horizontal)
+                
+                // FORM
                 VStack(spacing: 15) {
                     TextField("Email", text: $email)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .textInputAutocapitalization(.never)
+                        .textFieldStyle(.roundedBorder)
+                        .autocapitalization(.none)
                         .keyboardType(.emailAddress)
-                        .autocorrectionDisabled()
+                        .padding(5)
                     
                     SecureField("Lösenord", text: $password)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .textFieldStyle(.roundedBorder)
+                        .padding(5)
                     
                     if let error = authVM.errorMessage {
                         Text(error)
@@ -49,29 +59,28 @@ struct LoginView: View {
                     }
                     
                     Button(action: handleLogin) {
-                        if authVM.isLoading {
-                            ProgressView()
-                                .frame(maxWidth: .infinity)
-                        } else {
-                            Text("Logga in")
-                                .frame(maxWidth: .infinity)
-                        }
+                        Text(authVM.isLoading ? "Laddar..." : "Logga in")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(LinearGradient(colors: [.pink, .purple], startPoint: .leading, endPoint: .trailing))
+                            .foregroundColor(.white)
+                            .cornerRadius(20)
+                            .shadow(radius: 5)
                     }
-                    .buttonStyle(.borderedProminent)
                     .disabled(authVM.isLoading || email.isEmpty || password.isEmpty)
-                    .padding(.top)
                 }
                 .padding(.horizontal)
                 
-                // Sign up link
+                // SIGN UP LINK
                 Button("Inget konto? Skapa konto här") {
                     showingSignUp = true
                 }
-                .foregroundColor(.blue)
+                .foregroundColor(.orange)
+                .padding(.top)
                 
                 Spacer()
             }
-            .padding()
+            .padding(.top)
             .sheet(isPresented: $showingSignUp) {
                 SignUpView()
             }
@@ -80,12 +89,5 @@ struct LoginView: View {
     
     private func handleLogin() {
         authVM.signIn(email: email, password: password)
-    }
-}
-
-struct LoginView_Previews: PreviewProvider {
-    static var previews: some View {
-        LoginView()
-            .environmentObject(AuthenticationViewModel())
     }
 }

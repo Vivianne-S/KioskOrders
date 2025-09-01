@@ -18,7 +18,7 @@ struct KioskOrdersApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(authVM)
-                .environmentObject(kioskVM)
+                .environmentObject(kioskVM) 
         }
     }
 }
