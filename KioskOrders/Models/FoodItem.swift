@@ -12,7 +12,10 @@ import FirebaseFirestore
 struct FoodItem: Identifiable, Codable {
     @DocumentID var id: String?
     let name: String
+    let description: String
     let price: Double
     let category: String
     let availableAt: [String]
+    let isAvailable: Bool
+    let preparationTime: Int
 }

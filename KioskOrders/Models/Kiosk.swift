@@ -14,4 +14,6 @@ struct Kiosk: Identifiable, Codable {
     let name: String
     let description: String
     let category: String
+    let isActive: Bool
+    let waitTime: Int
 }
