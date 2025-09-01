@@ -7,25 +7,38 @@
 
 
 import Foundation
+import FirebaseFirestore
 
 class KioskViewModel: ObservableObject {
     @Published var kiosks: [Kiosk] = []
-    @Published var isLoading = false
+    // @Published var foodItems: [FoodItem] = [] ← TAGIT BORT (används inte)
+    
+    private let db = Firestore.firestore()
     
     func loadKiosks() {
-        isLoading = true
-        Task {
-            do {
-                let kiosks = try await FirebaseService.shared.fetchKiosks()
-                DispatchQueue.main.async {
-                    self.kiosks = kiosks
-                    self.isLoading = false
+        db.collection("kiosk").getDocuments { snapshot, error in
+            if let error = error {
+                print("❌ Fel vid hämtning av kiosker: \(error.localizedDescription)")
+                return
+            }
+            guard let documents = snapshot?.documents else { return }
+            self.kiosks = documents.compactMap { doc in
+                var kiosk: Kiosk?
+                do {
+                    kiosk = try doc.data(as: Kiosk.self)
+                } catch {
+                    print("❌ Kunde inte mappa kiosk: \(error)")
                 }
-            } catch {
-                print("Error loading kiosks: \(error)")
-                DispatchQueue.main.async {
-                    self.isLoading = false
+                if let k = kiosk {
+                    if k.id == nil {
+                        kiosk?.id = doc.documentID
+                    }
                 }
+                return kiosk
+            }
+            print("📦 Hittade \(self.kiosks.count) kiosker")
+            for k in self.kiosks {
+                print("📌 \(k.name) - \(k.id ?? "Ingen ID")")
             }
         }
     }

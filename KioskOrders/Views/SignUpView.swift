@@ -5,7 +5,6 @@
 //  Created by Vivianne Sonnerborg on 2025-09-01.
 //
 
-
 import SwiftUI
 
 struct SignUpView: View {
@@ -26,44 +25,61 @@ struct SignUpView: View {
     
     var body: some View {
         NavigationView {
-            Form {
-                Section("Personlig information") {
+            VStack(spacing: 20) {
+                
+                Text("Skapa konto")
+                    .font(.largeTitle)
+                    .fontWeight(.heavy)
+                    .foregroundColor(.pink)
+                
+                VStack(spacing: 15) {
                     TextField("Namn", text: $name)
+                        .textFieldStyle(.roundedBorder)
+                    
                     TextField("Email", text: $email)
-                        .textInputAutocapitalization(.never)
+                        .textFieldStyle(.roundedBorder)
+                        .autocapitalization(.none)
                         .keyboardType(.emailAddress)
+                    
                     SecureField("Lösenord", text: $password)
+                        .textFieldStyle(.roundedBorder)
+                    
                     SecureField("Bekräfta lösenord", text: $confirmPassword)
+                        .textFieldStyle(.roundedBorder)
                     
                     if !confirmPassword.isEmpty && !passwordsMatch {
                         Text("Lösenorden matchar inte")
                             .foregroundColor(.red)
                             .font(.caption)
                     }
-                }
-                
-                if let error = authVM.errorMessage {
-                    Section {
+                    
+                    if let error = authVM.errorMessage {
                         Text(error)
                             .foregroundColor(.red)
+                            .font(.caption)
                     }
-                }
-                
-                Section {
+                    
                     Button(action: handleSignUp) {
-                        if authVM.isLoading {
-                            ProgressView()
-                        } else {
-                            Text("Skapa konto")
-                        }
+                        Text(authVM.isLoading ? "Laddar..." : "Skapa konto")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(LinearGradient(colors: [.orange, .pink], startPoint: .leading, endPoint: .trailing))
+                            .foregroundColor(.white)
+                            .cornerRadius(20)
+                            .shadow(radius: 5)
                     }
                     .disabled(!isFormValid || authVM.isLoading)
                 }
+                .padding(.horizontal)
+                
+                Spacer()
+                
+                Button("Avbryt") {
+                    dismiss()
+                }
+                .foregroundColor(.purple)
+                .padding(.bottom)
             }
-            .navigationTitle("Skapa konto")
-            .navigationBarItems(trailing: Button("Avbryt") {
-                dismiss()
-            })
         }
     }
     
