@@ -7,31 +7,28 @@
 
 
 
+import SwiftUI
+
+
+struct ContentView: View {
+    @EnvironmentObject var authVM: AuthenticationViewModel
+    
+    var body: some View {
+        Group {
+            if authVM.isAuthenticated {
+                KioskListView() // 👈 Visa listan när man är inloggad
+            } else {
+                LoginView() // 👈 Annars logga in
+            }
+        }
+    }
+}
+
+
 //import SwiftUI
 
 //struct ContentView: View {
-    //@StateObject private var viewModel = KioskViewModel()
-    
-    //var body: some View {
-        //VStack {
-            //if viewModel.isLoading {
-             //   ProgressView("Laddar kiosker...")
-            //} else {
-                //List(viewModel.kiosks) { kiosk in
-              //      Text(kiosk.name)
-            //    }
-          //  }
-        //}
-        //.onAppear {
-      //      viewModel.loadKiosks()
-    //    }
-  //  }
+  //  var body: some View {
+    //    TestView() // ← Använd TestView temporärt
+    //}
 //}
-
-import SwiftUI
-
-struct ContentView: View {
-    var body: some View {
-        TestView() // ← Använd TestView temporärt
-    }
-}

@@ -1,3 +1,11 @@
+//
+//  LoginView.swift
+//  KioskOrders
+//
+//  Created by Vivianne Sonnerborg on 2025-09-01.
+//
+
+
 import SwiftUI
 
 struct LoginView: View {
