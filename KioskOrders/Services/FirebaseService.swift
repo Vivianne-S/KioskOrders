@@ -14,7 +14,7 @@ class FirebaseService {
     private let db = Firestore.firestore()
     
     func fetchKiosks() async throws -> [Kiosk] {
-        let snapshot = try await db.collection("kiosks").getDocuments()
+        let snapshot = try await db.collection("kiosk").getDocuments()
         return snapshot.documents.compactMap { document in
             try? document.data(as: Kiosk.self)
         }
