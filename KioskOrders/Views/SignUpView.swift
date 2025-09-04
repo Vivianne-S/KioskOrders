@@ -4,7 +4,6 @@
 //
 //  Created by Vivianne Sonnerborg on 2025-09-01.
 //
-
 import SwiftUI
 
 struct SignUpView: View {
@@ -14,6 +13,7 @@ struct SignUpView: View {
     @State private var password = ""
     @State private var confirmPassword = ""
     @State private var name = ""
+    @State private var buttonPressed = false
     
     var passwordsMatch: Bool {
         password == confirmPassword && !password.isEmpty
@@ -34,18 +34,26 @@ struct SignUpView: View {
                 
                 VStack(spacing: 15) {
                     TextField("Namn", text: $name)
-                        .textFieldStyle(.roundedBorder)
+                        .padding()
+                        .background(LinearGradient(colors: [.pink.opacity(0.2), .yellow.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .cornerRadius(15)
                     
                     TextField("Email", text: $email)
-                        .textFieldStyle(.roundedBorder)
+                        .padding()
+                        .background(LinearGradient(colors: [.purple.opacity(0.2), .orange.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .cornerRadius(15)
                         .autocapitalization(.none)
                         .keyboardType(.emailAddress)
                     
                     SecureField("Lösenord", text: $password)
-                        .textFieldStyle(.roundedBorder)
+                        .padding()
+                        .background(LinearGradient(colors: [.pink.opacity(0.2), .purple.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .cornerRadius(15)
                     
                     SecureField("Bekräfta lösenord", text: $confirmPassword)
-                        .textFieldStyle(.roundedBorder)
+                        .padding()
+                        .background(LinearGradient(colors: [.orange.opacity(0.2), .yellow.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .cornerRadius(15)
                     
                     if !confirmPassword.isEmpty && !passwordsMatch {
                         Text("Lösenorden matchar inte")
@@ -63,12 +71,17 @@ struct SignUpView: View {
                         Text(authVM.isLoading ? "Laddar..." : "Skapa konto")
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(LinearGradient(colors: [.orange, .pink], startPoint: .leading, endPoint: .trailing))
+                            .background(LinearGradient(colors: [.pink, .purple, .orange], startPoint: .leading, endPoint: .trailing))
                             .foregroundColor(.white)
                             .cornerRadius(20)
-                            .shadow(radius: 5)
+                            .shadow(color: .purple.opacity(0.5), radius: 5, x: 0, y: 5)
+                            .scaleEffect(buttonPressed ? 0.95 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.5), value: buttonPressed)
                     }
                     .disabled(!isFormValid || authVM.isLoading)
+                    .onLongPressGesture(minimumDuration: 0.01, pressing: { pressing in
+                        buttonPressed = pressing
+                    }, perform: {})
                 }
                 .padding(.horizontal)
                 
