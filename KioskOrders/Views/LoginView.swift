@@ -3,9 +3,7 @@
 //  KioskOrders
 //
 //  Created by Vivianne Sonnerborg on 2025-09-01.
-//
-
-
+//
 import SwiftUI
 
 struct LoginView: View {
@@ -13,7 +11,8 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var showingSignUp = false
-    
+    @State private var buttonPressed = false
+
     var body: some View {
         NavigationView {
             VStack(spacing: 25) {
@@ -23,7 +22,7 @@ struct LoginView: View {
                     LinearGradient(colors: [.pink, .purple, .orange], startPoint: .topLeading, endPoint: .bottomTrailing)
                         .frame(height: 180)
                         .cornerRadius(30)
-                        .shadow(radius: 5)
+                        .shadow(color: .purple.opacity(0.5), radius: 8, x: 0, y: 5)
                     
                     VStack(spacing: 8) {
                         Image(systemName: "cart.fill")
@@ -43,14 +42,16 @@ struct LoginView: View {
                 // FORM
                 VStack(spacing: 15) {
                     TextField("Email", text: $email)
-                        .textFieldStyle(.roundedBorder)
+                        .padding()
+                        .background(LinearGradient(colors: [.pink.opacity(0.2), .yellow.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .cornerRadius(15)
                         .autocapitalization(.none)
                         .keyboardType(.emailAddress)
-                        .padding(5)
                     
                     SecureField("Lösenord", text: $password)
-                        .textFieldStyle(.roundedBorder)
-                        .padding(5)
+                        .padding()
+                        .background(LinearGradient(colors: [.purple.opacity(0.2), .orange.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .cornerRadius(15)
                     
                     if let error = authVM.errorMessage {
                         Text(error)
@@ -62,12 +63,16 @@ struct LoginView: View {
                         Text(authVM.isLoading ? "Laddar..." : "Logga in")
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(LinearGradient(colors: [.pink, .purple], startPoint: .leading, endPoint: .trailing))
+                            .background(LinearGradient(colors: [.pink, .purple, .orange], startPoint: .leading, endPoint: .trailing))
                             .foregroundColor(.white)
                             .cornerRadius(20)
-                            .shadow(radius: 5)
+                            .shadow(color: .purple.opacity(0.5), radius: 5, x: 0, y: 5)
+                            .scaleEffect(buttonPressed ? 0.95 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.5), value: buttonPressed)
                     }
-                    .disabled(authVM.isLoading || email.isEmpty || password.isEmpty)
+                    .onLongPressGesture(minimumDuration: 0.01, pressing: { pressing in
+                        buttonPressed = pressing
+                    }, perform: {})
                 }
                 .padding(.horizontal)
                 
