@@ -144,3 +144,4 @@ logs/
 .AppleDouble
 .LSOverride
 
+serviceAccountKey.json
