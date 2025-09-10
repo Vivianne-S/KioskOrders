@@ -5,7 +5,6 @@
 //  Created by Vivianne Sonnerborg on 2025-09-01.
 //
 
-
 import SwiftUI
 
 struct KioskDetailView: View {
@@ -14,7 +13,7 @@ struct KioskDetailView: View {
 
     @StateObject private var viewModel = KioskDetailViewModel()
     @State private var wobble = false
-    @State private var showCart = false    // 👈 lägg till
+    @State private var showCart = false
 
     var body: some View {
         NavigationStack {
@@ -62,7 +61,7 @@ struct KioskDetailView: View {
                 }
                 .background(AppGradients.background.ignoresSafeArea())
 
-                // 🛒 Flytande kundvagns-knapp även här
+                // 🛒 Flytande kundvagns-knapp
                 VStack {
                     Spacer()
                     HStack {
@@ -77,8 +76,8 @@ struct KioskDetailView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
-                // Hämta varor för denna kiosk
-                viewModel.fetchFoodItems(for: kiosk.id ?? "")
+                // ✅ Skicka in hela kiosken istället för bara id
+                viewModel.fetchFoodItems(for: kiosk)
             }
             // Öppna varukorgen som sheet, med säkert kioskId
             .sheet(isPresented: $showCart) {
@@ -87,7 +86,7 @@ struct KioskDetailView: View {
                     kioskId: (kiosk.id ?? kiosk.name.lowercased())
                 )
             }
-            // (valfritt) liten kundvagn i navbar också
+            // liten kundvagn i navbar
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -119,6 +118,23 @@ struct KioskDetailView: View {
                 .font(.system(size: 18, weight: .medium, design: .rounded))
                 .foregroundColor(.white.opacity(0.95))
                 .multilineTextAlignment(.center)
+
+            // 🔹 Extra info-rad
+            HStack(spacing: 20) {
+                Label(kiosk.category.capitalized, systemImage: "tag.fill")
+                    .font(.subheadline)
+                    .foregroundColor(AppGradients.candyYellow)
+
+                Label("⏱ \(kiosk.waitTime) min väntetid", systemImage: "clock.fill")
+                    .font(.subheadline)
+                    .foregroundColor(AppGradients.candyGreen)
+            }
+
+            // 🔴🟢 Aktiv status
+            Text(kiosk.isActive ? "🟢 Öppen" : "🔴 Stängd")
+                .font(.subheadline)
+                .foregroundColor(kiosk.isActive ? AppGradients.candyGreen : .red)
+                .padding(.top, 4)
         }
     }
 
