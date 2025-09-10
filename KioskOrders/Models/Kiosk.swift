@@ -5,7 +5,6 @@
 //  Created by Vivianne Sonnerborg on 2025-09-01.
 //
 
-
 import Foundation
 import FirebaseFirestore
 
@@ -16,8 +15,16 @@ struct Kiosk: Identifiable, Codable {
     let category: String
     let isActive: Bool
     let waitTime: Int
-    
-    init(id: String? = nil, name: String, description: String, category: String, isActive: Bool, waitTime: Int) {
+
+    // 🔹 Säker init som ger defaultvärden om något saknas i Firestore
+    init(
+        id: String? = nil,
+        name: String = "Okänd kiosk",
+        description: String = "",
+        category: String = "misc",
+        isActive: Bool = true,
+        waitTime: Int = 5
+    ) {
         self.id = id
         self.name = name
         self.description = description

@@ -2,9 +2,8 @@
 //  KioskDetailViewModel.swift
 //  KioskOrders
 //
-//  Created by Vivianne Sonnerborg on 2025-09-04.
-//
-
+//  Created by Vivianne Sonnerborg on 2025-09-01.
+//
 
 import Foundation
 import FirebaseFirestore
@@ -18,37 +17,46 @@ class KioskDetailViewModel: ObservableObject {
 
     private let db = Firestore.firestore()
 
-    func fetchFoodItems(for kioskId: String) {
+    // ✅ Nu tar vi hela Kiosk som parameter
+    func fetchFoodItems(for kiosk: Kiosk) {
+        guard let kioskId = kiosk.id else {
+            self.errorMessage = "Kiosk saknar ID"
+            return
+        }
+
         isLoading = true
         errorMessage = nil
 
         db.collection("fooditems")
             .whereField("availableAt", arrayContains: kioskId)
-            .getDocuments { [weak self] snapshot, error in
-                guard let self = self else { return }
-                self.isLoading = false
+            .getDocuments { snapshot, error in
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    if let error = error {
+                        self.errorMessage = "Fel vid hämtning: \(error.localizedDescription)"
+                        return
+                    }
 
-                if let error = error {
-                    self.errorMessage = "Firestore error: \(error.localizedDescription)"
-                    return
+                    self.foodItems = snapshot?.documents.compactMap { doc in
+                        try? doc.data(as: FoodItem.self)
+                    } ?? []
+
+                    print("✅ Hittade \(self.foodItems.count) varor för kiosk \(kiosk.name)")
                 }
-
-                guard let documents = snapshot?.documents else {
-                    self.foodItems = []
-                    return
-                }
-
-                self.foodItems = documents.compactMap { try? $0.data(as: FoodItem.self) }
             }
     }
 
     func handleTap(on item: FoodItem, cartItems: inout [FoodItem]) {
-        guard item.isAvailable else { return }
         pressedItemId = item.id
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             self.pressedItemId = nil
         }
-        cartItems.append(item)
-        print("🍭 Added \(item.name) to cart")
+
+        if item.isAvailable {
+            cartItems.append(item)
+            print("🛒 Tillagd i kundvagn: \(item.name)")
+        } else {
+            print("❌ \(item.name) är slut")
+        }
     }
 }

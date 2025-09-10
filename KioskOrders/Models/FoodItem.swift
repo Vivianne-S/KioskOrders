@@ -5,17 +5,16 @@
 //  Created by Vivianne Sonnerborg on 2025-09-01.
 //
 
-
 import Foundation
 import FirebaseFirestore
 
 struct FoodItem: Identifiable, Codable {
     @DocumentID var id: String?
-    let name: String
-    let description: String
-    let price: Double
-    let category: String
-    let availableAt: [String]
-    let isAvailable: Bool
-    let preparationTime: Int
+    var name: String
+    var description: String? = ""   // 👈 gör optional med default
+    var price: Double
+    var category: String? = "Snacks" // 👈 gör optional med default
+    var availableAt: [String]
+    var isAvailable: Bool
+    var preparationTime: Int
 }
