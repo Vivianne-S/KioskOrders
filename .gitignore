@@ -1,14 +1,10 @@
+# macOS
+.DS_Store
 
 # Xcode
-#
-# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
-
-## Build generated
 build/
 DerivedData/
 *.xcworkspace
-
-## Various settings
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -19,68 +15,18 @@ DerivedData/
 !default.perspectivev3
 xcuserdata/
 
-## Other
-*.moved-aside
-*.xccheckout
-*.xcscmblueprint
-
-## Obj-C/Swift specific
-*.hmap
-*.ipa
-*.dSYM.zip
-*.dSYM
-
-## Playgrounds
-timeline.xctimeline
-playground.xcworkspace
-
 # Swift Package Manager
-#
-# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
-# Packages/
-# Package.pins
-# Package.resolved
-# *.xcodeproj
-#
-# Xcode automatically generates this directory with a .xcworkspacedata file and xcuserdata
-# hence it is not needed unless you have added a package configuration file to your project
-# .swiftpm
+.build/
+.swiftpm/
 
 # CocoaPods
-#
-# We recommend against adding the Pods directory to your .gitignore. However
-# you should judge for yourself, the pros and cons are mentioned at:
-# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
-#
-# Pods/
-#
-# Add this line if you don't want to check in the podspecs for your dependencies
-# Podspecs/
+Pods/
+Podfile.lock
 
 # Carthage
-#
-# Add this line if you want to avoid checking in source code from Carthage dependencies.
-# Carthage/Checkouts
-#
 Carthage/Build/
 
-# Fastlane
-#
-# It is recommended to not store the screenshots in the git repository. Instead, use fastlane to re-generate the
-# screenshots whenever they are needed.
-# For more information about the recommended setup visit:
-# https://docs.fastlane.tools/best-practices/source-control/
-
-fastlane/report.xml
-fastlane/Preview.html
-fastlane/screenshots
-fastlane/test_output
-
-# Code Injection
-#
-# After new code Injection tools there's a generated folder /iOSInjectionProject
-# https://github.com/johnno1962/injectionforxcode
-
+# After new code Injection tools
 iOSInjectionProject/
 
 # Firebase och känslig konfiguration
@@ -91,57 +37,18 @@ Firebase/
 firebase.json
 .firebaserc
 .firebase/
+serviceAccountKey.json
 
 # API nycklar och hemligheter
 *.env
 .env.local
 .env.development.local
 .env.test.local
-.env.production.local
-secrets.swift
-config.swift
-APIKeys.swift
-Keys.swift
 
-# Autogenererade filer
-*.generated.swift
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
 
-# Systemfiler
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# App specifika byggfiler
-Pods/
-Podfile.lock
-.swiftpm
-.xcodeproj/
-*.xcworkspace/
-
-# Profiler och instrumentering
-*.profraw
-*.gcda
-*.gcno
-
-# Loggar
-*.log
-logs/
-
-# Personliga inställningar
-*.swp
-*.swo
-*~
-
-# Backupfiler
-*.backup
-*.bk
-
-# macOS
-.AppleDouble
-.LSOverride
-
-serviceAccountKey.json
+# Misc
+*.hprof
