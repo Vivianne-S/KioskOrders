@@ -1,7 +1,7 @@
 //
 //  MainOrdersView.swift
 //  KioskOrders
-//
+//
 
 import SwiftUI
 
@@ -32,12 +32,28 @@ struct MainOrdersView: View {
             }
         } else {
             // 🧑 Kund-vy
-            NavigationView {
-                KioskListView()
-                    .navigationTitle("Kiosker")
-                    .navigationBarItems(trailing: Button("Logga ut") {
-                        authVM.signOut()
-                    })
+            TabView {
+                NavigationView {
+                    KioskListView()
+                        .navigationTitle("Kiosker")
+                        .navigationBarItems(trailing: Button("Logga ut") {
+                            authVM.signOut()
+                        })
+                }
+                .tabItem {
+                    Label("Kiosker", systemImage: "cart")
+                }
+
+                NavigationView {
+                    CustomerOrdersView()
+                        .navigationTitle("Mina ordrar")
+                        .navigationBarItems(trailing: Button("Logga ut") {
+                            authVM.signOut()
+                        })
+                }
+                .tabItem {
+                    Label("Mina ordrar", systemImage: "list.bullet")
+                }
             }
         }
     }
