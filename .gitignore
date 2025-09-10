@@ -1,3 +1,6 @@
+
+# Xcode
+#
 # macOS
 .DS_Store
 
@@ -30,25 +33,4 @@ Carthage/Build/
 iOSInjectionProject/
 
 # Firebase och känslig konfiguration
-GoogleService-Info.plist
-GoogleService-Info.debug.plist
-GoogleService-Info.release.plist
-Firebase/
-firebase.json
-.firebaserc
-.firebase/
-serviceAccountKey.json
-
-# API nycklar och hemligheter
-*.env
-.env.local
-.env.development.local
-.env.test.local
-
-# Node.js
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# Misc
-*.hprof
+Googl
