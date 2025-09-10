@@ -8,130 +8,89 @@
 import SwiftUI
 
 struct CartView: View {
-    // MARK: - Bindings
     @Binding var cartItems: [FoodItem]
-    
-    // MARK: - Body
+    let kioskId: String
+
+    @StateObject private var orderVM = OrderPlacementViewModel()
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var showConfirmation = false
+    @State private var showError = false
+    @State private var errorText = "Kunde inte skicka order"
+
+    var totalPrice: Double { cartItems.reduce(0) { $0 + $1.price } }
+
     var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                
-                // MARK: - Empty Cart
-                if cartItems.isEmpty {
-                    ZStack {
-                        AppGradients.background
-                            .ignoresSafeArea()
-                        
-                        // MARK: Decorative Circles
-                        Circle()
-                            .fill(AppGradients.candyYellow.opacity(0.2))
-                            .frame(width: 80, height: 80)
-                            .offset(x: -50, y: -100)
-                        
-                        Circle()
-                            .fill(AppGradients.candyGreen.opacity(0.15))
-                            .frame(width: 60, height: 60)
-                            .offset(x: 70, y: 80)
-                        
-                        VStack(spacing: 20) {
-                            Image(systemName: "cart")
-                                .font(.system(size: 60))
-                                .foregroundColor(AppGradients.candyPink)
-                            Text("Your cart is empty")
-                                .font(.title2)
-                                .foregroundColor(AppGradients.candyPurple)
+        VStack {
+            if cartItems.isEmpty {
+                Text("🛒 Din varukorg är tom")
+                    .font(.title2)
+                    .foregroundColor(.gray)
+                    .padding()
+            } else {
+                List {
+                    ForEach(cartItems) { item in
+                        HStack {
+                            Text(item.name).font(.headline)
+                            Spacer()
+                            Text("\(Int(item.price)) kr").font(.subheadline)
                         }
-                        .padding()
                     }
-                    Spacer()
-                    
-                // MARK: - Cart Items
-                } else {
-                    ScrollView {
-                        VStack(spacing: 15) {
-                            ForEach(cartItems) { item in
-                                
-                                // MARK: - Single Cart Item Row
-                                HStack {
-                                    ZStack {
-                                        Circle()
-                                            .fill(
-                                                LinearGradient(
-                                                    colors: [AppGradients.candyYellow, AppGradients.candyPink],
-                                                    startPoint: .top,
-                                                    endPoint: .bottom
-                                                )
-                                            )
-                                            .frame(width: 50, height: 50)
-                                        Image(systemName: "cart.fill")
-                                            .foregroundColor(.white)
-                                    }
-                                    
-                                    VStack(alignment: .leading, spacing: 5) {
-                                        Text(item.name)
-                                            .font(.headline)
-                                            .foregroundColor(.white)
-                                        Text("\(Int(item.price)) kr • \(item.preparationTime) min")
-                                            .font(.subheadline)
-                                            .foregroundColor(.white.opacity(0.8))
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Button(action: {
-                                        if let index = cartItems.firstIndex(where: { $0.id == item.id }) {
-                                            cartItems.remove(at: index)
-                                        }
-                                    }) {
-                                        Image(systemName: "trash.fill")
-                                            .foregroundColor(.red)
-                                    }
-                                }
-                                .padding()
-                                .background(AppGradients.cardGradient)
-                                .cornerRadius(20)
-                                .shadow(color: AppGradients.candyPurple.opacity(0.4), radius: 5, x: 0, y: 5)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                                )
-                                .padding(.horizontal)
-                            }
-                        }
-                        .padding(.vertical)
-                    }
-                    
-                    // MARK: - Total Price
+                    .onDelete(perform: removeItems)
+
                     HStack {
-                        Text("Total:")
-                            .font(.title2).bold()
+                        Text("Totalt").font(.headline)
                         Spacer()
-                        let total = cartItems.reduce(0) { $0 + $1.price }
-                        Text("\(Int(total)) kr")
-                            .font(.title2).bold()
+                        Text("\(Int(totalPrice)) kr").font(.headline)
                     }
-                    .padding(.horizontal)
-                    
-                    // MARK: - Checkout Button
-                    Button(action: {
-                        print("✅ Order placed")
-                        cartItems.removeAll()
-                    }) {
-                        Text("Checkout Now")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(AppGradients.fabGradient)
-                            .cornerRadius(25)
-                            .shadow(color: AppGradients.candyPurple.opacity(0.4), radius: 5, x: 0, y: 5)
-                            .padding(.horizontal)
+                }
+
+                Button {
+                    Task {
+                        // ✅ Fallback för kioskId om prop är tomt
+                        let fallback = cartItems.first?.availableAt.first ?? ""
+                        let finalKioskId = kioskId.isEmpty ? fallback : kioskId
+
+                        print("🧾 Försöker skicka order. kioskId='\(finalKioskId)', items=\(cartItems.map{$0.name})")
+
+                        guard !finalKioskId.isEmpty else {
+                            errorText = "Saknar kioskId (välj kiosk innan du beställer)."
+                            showError = true
+                            return
+                        }
+
+                        let result = await orderVM.placeOrder(kioskId: finalKioskId, items: cartItems)
+                        switch result {
+                        case .success:
+                            cartItems.removeAll()
+                            showConfirmation = true
+                        case .failure(let err):
+                            errorText = err            // ⬅️ visa riktig feltext
+                            showError = true
+                        }
                     }
-                    .padding(.bottom)
+                } label: {
+                    Text("✅ Skicka beställning")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .padding(.horizontal)
                 }
             }
-            // MARK: - Navigation
-            .navigationTitle("🛒 Your Cart")
+        }
+        .navigationTitle("Varukorg")
+        .alert("🎉 Din order är skickad!", isPresented: $showConfirmation) {
+            Button("OK") { dismiss() }
+        }
+        .alert("Kunde inte skicka order", isPresented: $showError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorText)
         }
     }
+
+    private func removeItems(at offsets: IndexSet) { cartItems.remove(atOffsets: offsets) }
 }
