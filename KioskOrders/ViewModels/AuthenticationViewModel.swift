@@ -81,14 +81,28 @@ class AuthenticationViewModel: ObservableObject {
                 print("❌ Fel vid hämtning av employee-roll: \(error.localizedDescription)")
                 return
             }
-            if let data = snapshot?.data() {
-                self?.isEmployee = true
-                self?.employeeKioskId = data["kioskId"] as? String
-                print("👩‍🍳 Inloggad som employee för kiosk \(self?.employeeKioskId ?? "-")")
-            } else {
-                self?.isEmployee = false
-                self?.employeeKioskId = nil
-                print("🧑 Inloggad som vanlig kund")
+            guard let data = snapshot?.data() else {
+                DispatchQueue.main.async {
+                    self?.isEmployee = false
+                    self?.employeeKioskId = nil
+                    print("🧑 Inloggad som vanlig kund")
+                }
+                return
+            }
+
+            let role = data["role"] as? String ?? "customer"
+            let kioskId = data["kioskId"] as? String
+
+            DispatchQueue.main.async {
+                if role == "employee" {
+                    self?.isEmployee = true
+                    self?.employeeKioskId = kioskId
+                    print("👩‍🍳 Inloggad som employee för kiosk \(kioskId ?? "-")")
+                } else {
+                    self?.isEmployee = false
+                    self?.employeeKioskId = nil
+                    print("🧑 Inloggad som vanlig kund (role=\(role))")
+                }
             }
         }
     }
