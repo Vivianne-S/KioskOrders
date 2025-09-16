@@ -242,35 +242,54 @@ struct AdminDashboardView: View {
     }
 
     private func createEmployee() {
-        guard !employeeEmail.isEmpty, !employeePassword.isEmpty, !employeeName.isEmpty, !selectedKioskId.isEmpty else {
-            print("❌ Alla fält måste fyllas i")
-            return
-        }
+      guard !employeeEmail.isEmpty, !employeePassword.isEmpty, !employeeName.isEmpty, !selectedKioskId.isEmpty else {
+          print("❌ Alla fält måste fyllas i")
+          return
+      }
 
-        Auth.auth().createUser(withEmail: employeeEmail, password: employeePassword) { result, error in
-            if let error = error {
-                print("❌ Kunde inte skapa användare: \(error.localizedDescription)")
-                return
-            }
-            guard let uid = result?.user.uid else { return }
+      // 🔑 Spara undan admin-inloggning innan createUser
+      let adminEmail = "admin@admin.se"
+      let adminPassword = "123456"
 
-            db.collection("employees").document(uid).setData([
-                "kioskId": selectedKioskId,
-                "name": employeeName,
-                "role": "employee"
-            ]) { err in
-                if let err = err {
-                    print("❌ Kunde inte spara employee: \(err.localizedDescription)")
-                } else {
-                    print("✅ Anställd skapad: \(employeeName) → kiosk=\(selectedKioskId)")
-                    employeeName = ""
-                    employeeEmail = ""
-                    employeePassword = ""
-                }
-            }
-        }
-    }
+      let currentUser = Auth.auth().currentUser
 
+      Auth.auth().createUser(withEmail: employeeEmail, password: employeePassword) { result, error in
+          if let error = error {
+              print("❌ Kunde inte skapa användare: \(error.localizedDescription)")
+              return
+          }
+          guard let uid = result?.user.uid else { return }
+
+          print("✅ FirebaseAuth: ny employee skapad med uid=\(uid)")
+
+          // 👉 Logga tillbaka in som admin
+          Auth.auth().signIn(withEmail: adminEmail, password: adminPassword) { _, error in
+              if let error = error {
+                  print("❌ Kunde inte logga in som admin: \(error.localizedDescription)")
+                  return
+              }
+
+              // 👩‍🍳 Lägg till employee-dokumentet i Firestore
+              let employeeData: [String: Any] = [
+                  "kioskId": selectedKioskId,
+                  "name": employeeName,
+                  "email": employeeEmail,
+                  "role": "employee"
+              ]
+
+              db.collection("employees").document(uid).setData(employeeData) { err in
+                  if let err = err {
+                      print("❌ Kunde inte spara employee: \(err.localizedDescription)")
+                  } else {
+                      print("✅ Employee \(employeeName) kopplad till kiosk \(selectedKioskId)")
+                      employeeName = ""
+                      employeeEmail = ""
+                      employeePassword = ""
+                  }
+              }
+          }
+      }
+  }
     private func addFoodItem() {
     guard !foodName.isEmpty,
           let price = Double(foodPrice),
