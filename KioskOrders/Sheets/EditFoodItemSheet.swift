@@ -32,12 +32,14 @@ struct EditFoodItemSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Avbryt") { dismiss() }
+                        .foregroundColor(.red)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Spara") {
                         onSave(item)
                         dismiss()
                     }
+                    .foregroundColor(.green)
                 }
             }
         }
