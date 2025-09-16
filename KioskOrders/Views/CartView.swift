@@ -31,20 +31,67 @@ struct CartView: View {
                 List {
                     ForEach(cartItems) { item in
                         HStack {
-                            Text(item.name).font(.headline)
+                            // 📦 Namn
+                            Text(item.name)
+                                .font(.headline)
+                                .foregroundColor(.white)
+
                             Spacer()
-                            Text("\(Int(item.price)) kr").font(.subheadline)
+
+                            // 💰 Pris
+                            Text("\(Int(item.price)) kr")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.9))
+
+                            // 🗑️ Ta bort-knapp
+                            Button {
+                                if let index = cartItems.firstIndex(where: { $0.id == item.id }) {
+                                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                                        cartItems.remove(at: index)
+                                    }
+                                }
+                            } label: {
+                                Image(systemName: "trash.fill")
+                                    .foregroundColor(.red.opacity(0.85))
+                            }
+                            .buttonStyle(.plain)
                         }
+                        .padding()
+                        .background(
+                            LinearGradient(colors: [AppGradients.candyPink, AppGradients.candyPurple],
+                                           startPoint: .topLeading,
+                                           endPoint: .bottomTrailing)
+                        )
+                        .cornerRadius(12)
+                        .shadow(color: AppGradients.candyPurple.opacity(0.4), radius: 6, x: 0, y: 3)
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
                     }
-                    .onDelete(perform: removeItems)
 
+                    // ➕ Totalt-rad
                     HStack {
-                        Text("Totalt").font(.headline)
+                        Text("Totalt")
+                            .font(.headline)
+                            .foregroundColor(.white)
                         Spacer()
-                        Text("\(Int(totalPrice)) kr").font(.headline)
+                        Text("\(Int(totalPrice)) kr")
+                            .font(.headline)
+                            .foregroundColor(.white)
                     }
+                    .padding()
+                    .background(
+                        LinearGradient(colors: [AppGradients.candyBlue, AppGradients.candyPurple],
+                                       startPoint: .leading,
+                                       endPoint: .trailing)
+                    )
+                    .cornerRadius(12)
+                    .shadow(color: AppGradients.candyBlue.opacity(0.4), radius: 6, x: 0, y: 3)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
                 }
+                .scrollContentBackground(.hidden) // gör hela listbakgrunden transparent
 
+                // ✅ Skicka beställning-knapp
                 Button {
                     Task {
                         // ✅ Fallback för kioskId om prop är tomt
@@ -74,9 +121,10 @@ struct CartView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.green)
+                        .background(AppGradients.fabGradient)
                         .foregroundColor(.white)
-                        .cornerRadius(12)
+                        .cornerRadius(15)
+                        .shadow(radius: 6)
                         .padding(.horizontal)
                 }
             }

@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-struct FoodItem: Identifiable, Codable {
+struct FoodItem: Identifiable, Codable, Equatable {
     @DocumentID var id: String?
     var name: String
     var description: String? = ""   // 👈 gör optional med default
